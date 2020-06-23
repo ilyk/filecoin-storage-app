@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cat > /usr/share/nginx/html/runtime-config.js <<- CONFIG
+  window.appConfig = {
+    wsUrl: "ws://${API_HOST}/",
+    apiUrl: "http://${API_HOST}/",
+  }
+CONFIG
+
+nginx -g "daemon off;"
