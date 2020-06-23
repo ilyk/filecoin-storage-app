@@ -1,4 +1,4 @@
-#Project Description
+# Project Description
 
 **Storage Client Webapp with Redundant Deals**: A web application and storage deal agent that supports users storing data redundantly with multiple miners. The app will track active storage deals and allow users to perform data retrieval.
 
