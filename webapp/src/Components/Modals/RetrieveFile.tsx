@@ -26,15 +26,25 @@ interface IProps {
     show: boolean;
 }
 
-function start(file: IFile) {
+function start(file: IFile,addToast:Function) {
     let err = service.startRetrieving(file.cid)
     if (err != null) {
-        console.error(err)
+        addToast(err, {
+            appearance: 'error',
+            autoDismiss: true,
+        })
+    } else {
+        addToast("Done!", {
+            appearance: 'info',
+            autoDismiss: true,
+        })
     }
 }
 
 export const RetrieveFileModal = ({file, toggle, show}: IProps) => {
     const [progress, setProgress] = useState(false)
+    //const { addToast } = useToasts()
+    const addToast = () => {}
 
     return null == file ? <span/> : <Modal show={show} onHide={toggle}>
         <Modal.Header closeButton>
@@ -50,7 +60,7 @@ export const RetrieveFileModal = ({file, toggle, show}: IProps) => {
             <Button variant="dark" onClick={() => toggle(null)}>Close</Button>
             <Button variant="primary" onClick={() => {
                 setProgress(true);
-                start(file)
+                start(file, addToast)
             }} disabled={progress}>
                 <Image src={download_from_cloud} width={24}/>
                 Begin Retrieving

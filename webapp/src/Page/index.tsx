@@ -15,5 +15,3 @@
  */
 
 export * from "./Files";
-export * from "./Upload";
-export * from "./Get";

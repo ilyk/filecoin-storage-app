@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 
+import {Navbar, Row} from "react-bootstrap";
 import React from "react";
 
-export const UploadPage = () => <div/>
+export const Footer = () => <footer>
+    <Navbar bg="light" fixed="bottom">
+        <Navbar.Text className="text-right small pull-right">
+            <Row>Copyright 2020 <a href="https://github.com/ilyk" target="_blank" rel="noopener noreferrer">
+                Ievgen Pervushyn</a></Row>
+            <Row>Icons made by <a href="http://www.freepik.com/" title="Freepik">Freepik</a> from <a
+                href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a></Row>
+        </Navbar.Text>
+    </Navbar>
+</footer>

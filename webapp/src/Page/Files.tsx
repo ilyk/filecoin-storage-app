@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {Dispatch, SetStateAction} from "react";
 import {Container, Table} from "react-bootstrap";
 import {DownloadButton, DownloadCloudButton, UploadCloudButton} from "../Components/Buttons";
 import {Spinner} from "../Components/Spinner";
 import {RetrieveFileModal} from "../Components/Modals/RetrieveFile";
 import {FileStatus, IFile} from "../_models/File";
+import {service} from "../_service/backend";
 
 interface IProps {
+    files: IFile[];
+    setFiles: Dispatch<SetStateAction<IFile[]>>;
 }
 
 interface IModal {
@@ -32,12 +35,11 @@ interface IModal {
 
 interface IModals {
     retrieve: IModal;
-    // upload: IModal;
+    upload: IModal;
     // store: IModal;
 }
 
 interface IState {
-    files: IFile[];
     modals: IModals;
 }
 
@@ -45,47 +47,6 @@ export class FilesPage extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            files: [{
-                cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
-                status: FileStatus.OnServer,
-                miners: 0,
-                price: 0,
-                duration: 0,
-                total: 0,
-                size: 0,
-            }, {
-                cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
-                status: FileStatus.Downloading,
-                miners: 12,
-                price: 0.5078,
-                duration: 10,
-                total: 60.936,
-                size: 126976,
-            }, {
-                cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
-                status: FileStatus.Sealed,
-                miners: 8,
-                price: 12.3,
-                duration: 10,
-                total: 984,
-                size: 545259520,
-            }, {
-                cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
-                status: FileStatus.Staged,
-                miners: 3,
-                price: 3,
-                duration: 10,
-                total: 90,
-                size: 3221225472,
-            }, {
-                cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
-                status: FileStatus.Downloaded,
-                miners: 12,
-                price: 0.000117,
-                duration: 10,
-                total: 0.01404,
-                size: 125952,
-            },],
             modals: {
                 retrieve: {
                     file: null,
@@ -96,9 +57,23 @@ export class FilesPage extends React.Component<IProps, IState> {
                         modals.retrieve.file = file
                         this.setState({modals: modals})
                     }
+                },
+                upload: {
+                    file: null,
+                    show: false,
+                    toggle: (file: IFile | null) => {
+                        const modals = this.state.modals;
+                        modals.upload.show = file != null
+                        modals.upload.file = file
+                        this.setState({modals: modals})
+                    }
                 }
             }
         }
+    }
+
+    componentDidMount() {
+        service.reloadFiles(this.props.setFiles)
     }
 
     render() {
@@ -116,7 +91,7 @@ export class FilesPage extends React.Component<IProps, IState> {
             </tr>
             </thead>
             <tbody>
-            {this.state.files.map((file, idx) => <tr key={idx}>
+            {this.props.files.map((file, idx) => <tr key={idx}>
                 <td>{file.cid}</td>
                 <td align="center">{file.status}</td>
                 <td align="center">{file.miners}</td>
@@ -132,6 +107,10 @@ export class FilesPage extends React.Component<IProps, IState> {
                 toggle={this.state.modals.retrieve.toggle}
                 show={this.state.modals.retrieve.show}
                 file={this.state.modals.retrieve.file}/>
+            {/*<StoreFileModal*/}
+            {/*    toggle={this.state.modals.upload.toggle}*/}
+            {/*    show={this.state.modals.upload.show}*/}
+            {/*    file={this.state.modals.upload.file}/>*/}
         </Container>;
     }
 }

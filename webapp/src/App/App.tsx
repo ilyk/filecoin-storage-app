@@ -14,36 +14,32 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {NavBar} from "../Navigation";
-import {Navbar, Row} from "react-bootstrap";
-import {Route, Router, Switch} from "react-router";
-import {createBrowserHistory} from 'history';
-import {FilesPage, GetPage, UploadPage} from '../Page';
-
-const history = createBrowserHistory();
+import {FilesPage} from '../Page';
+import {UploadFileModal} from "../Components/Modals/UploadFile";
+import {Footer} from "../Navigation/Footer";
+import {service} from "../_service/backend";
+import {IFile} from "../_models/File";
 
 export const App = () => {
-    return (
-        <Router history={history}>
-            <NavBar/>
-            <Switch>
-                <Route path="/" render={props => <FilesPage key={Date.now()} {...props} />}/>
-                <Route path="/upload" render={props => <UploadPage key={Date.now()} {...props} />}/>
-                <Route path="/get" render={props => <GetPage key={Date.now()} {...props} />}/>
-            </Switch>
-            <footer>
-                <Navbar bg="light" fixed="bottom">
-                    <Navbar.Text className="text-right small pull-right">
-                        <Row>Copyright 2020 <a href="https://github.com/ilyk" target="_blank" rel="noopener noreferrer">Ievgen
-                            Pervushyn</a></Row>
-                        <Row>Icons made by <a href="http://www.freepik.com/" title="Freepik">Freepik</a> from <a
-                            href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a></Row>
-                    </Navbar.Text>
-                </Navbar>
-            </footer>
-        </Router>
-    );
+    const iFiles: IFile[] = []
+    const [showUpload, showHideUpload] = useState(false)
+    const [showGet, showHideGet] = useState(false)
+    const [files, setFiles] = useState(iFiles)
+
+    return <>
+        <NavBar showUpload={showUpload} showHideUpload={showHideUpload} showGet={showGet} showHideGet={showHideGet}/>
+        <FilesPage files={files} setFiles={setFiles}/>
+        <Footer/>
+
+        <UploadFileModal toggle={(uploaded: boolean) => {
+            showHideUpload(!showUpload)
+            if (uploaded) {
+                service.reloadFiles(setFiles)
+            }
+        }} show={showUpload}/>
+    </>;
 }

@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import {Dispatch, SetStateAction} from "react";
+import {FileStatus, IFile} from "../_models/File";
+
 export const service = {
     startRetrieving: (cid: string): Error | null => {
         return null
@@ -21,10 +24,50 @@ export const service = {
     initiateStoring: (cid: string, duration: number, redundancy: number): Error | null => {
         return null
     },
-    uploadFile: (data: any): Error | null => {
-        return null
-    },
     downloadFile: (cid: string): Error | null => {
         return null
     },
+    reloadFiles: (setFiles: Dispatch<SetStateAction<IFile[]>>) => {
+        setFiles([{
+            cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
+            status: FileStatus.OnServer,
+            miners: 0,
+            price: 0,
+            duration: 0,
+            total: 0,
+            size: 0,
+        }, {
+            cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
+            status: FileStatus.Downloading,
+            miners: 12,
+            price: 0.5078,
+            duration: 10,
+            total: 60.936,
+            size: 126976,
+        }, {
+            cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
+            status: FileStatus.Sealed,
+            miners: 8,
+            price: 12.3,
+            duration: 10,
+            total: 984,
+            size: 545259520,
+        }, {
+            cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
+            status: FileStatus.Staged,
+            miners: 3,
+            price: 3,
+            duration: 10,
+            total: 90,
+            size: 3221225472,
+        }, {
+            cid: "basdasdfgfsdsgfagsdfhsdfasfgas",
+            status: FileStatus.Downloaded,
+            miners: 12,
+            price: 0.000117,
+            duration: 10,
+            total: 0.01404,
+            size: 125952,
+        },])
+    }
 }

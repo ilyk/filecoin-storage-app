@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
+import { useToasts } from 'react-toast-notifications'
 import React from "react";
+import {Button} from "react-bootstrap";
 
-export const GetPage = () => <div/>
+interface IProps {
+    content: string
+}
+export const Toast = ({ content }: IProps) => {
+    const { addToast } = useToasts()
+    return <Button onClick={() => addToast(content, {
+        appearance: 'error',
+        autoDismiss: true,
+    })}>
+        Add Toast
+    </Button>
+}
