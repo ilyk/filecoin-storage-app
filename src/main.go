@@ -16,6 +16,43 @@
 
 package main
 
-func init() {
+import (
+	"context"
+	"go.uber.org/fx"
+	"ilyk.im/fil/storage/services/file/upload"
+	"net/http"
+)
 
+func main() {
+	fx.New(
+		fx.Provide(upload.NewTusUploader),
+		fx.Invoke(registerHttp),
+	).Run()
+}
+
+func registerHttp(lifecycle fx.Lifecycle, uploader upload.Handler) {
+	mux := http.NewServeMux()
+	server := http.Server{
+		Addr:    ":8080",
+		Handler: mux,
+	}
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	fileUploadPrefix := "/api/files/"
+	mux.Handle(fileUploadPrefix, http.StripPrefix(fileUploadPrefix, uploader.Handler(fileUploadPrefix)))
+
+	lifecycle.Append(
+		fx.Hook{
+			OnStart: func(context.Context) error {
+				//goland:noinspection GoUnhandledErrorResult
+				go server.ListenAndServe()
+				return nil
+			},
+			OnStop: func(ctx context.Context) error {
+				return server.Shutdown(ctx)
+			},
+		},
+	)
 }
