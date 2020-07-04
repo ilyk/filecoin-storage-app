@@ -19,27 +19,30 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {NavBar} from "../Navigation";
 import {FilesPage} from '../Page';
-import {UploadFileModal} from "../Components/Modals/UploadFile";
+import {GetFileModal, UploadFileModal} from "../Components/Modals";
 import {Footer} from "../Navigation/Footer";
 import {service} from "../_service/backend";
-import {IFile} from "../_models/File";
+import {ToastProvider} from "react-toast-notifications";
 
 export const App = () => {
-    const iFiles: IFile[] = []
     const [showUpload, showHideUpload] = useState(false)
     const [showGet, showHideGet] = useState(false)
-    const [files, setFiles] = useState(iFiles)
 
-    return <>
+    return <ToastProvider
+        autoDismiss
+        autoDismissTimeout={6000}
+        placement="top-center"
+    >
         <NavBar showUpload={showUpload} showHideUpload={showHideUpload} showGet={showGet} showHideGet={showHideGet}/>
-        <FilesPage files={files} setFiles={setFiles}/>
+        <FilesPage/>
         <Footer/>
 
         <UploadFileModal toggle={(uploaded: boolean) => {
             showHideUpload(!showUpload)
             if (uploaded) {
-                service.reloadFiles(setFiles)
+                service.reloadFiles()
             }
         }} show={showUpload}/>
-    </>;
+        <GetFileModal toggle={() => showHideGet(!showGet)} show={showGet}/>
+    </ToastProvider>;
 }

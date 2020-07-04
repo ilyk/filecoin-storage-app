@@ -15,8 +15,7 @@
  */
 
 import React, {Dispatch, SetStateAction} from 'react';
-import {Button, Image, Nav, Navbar, Row} from "react-bootstrap";
-import user_icon from '../../_resources/icons/user.svg'
+import {Button, Nav, Navbar} from "react-bootstrap";
 
 interface IProps {
     showUpload: boolean;
@@ -34,20 +33,22 @@ export const NavBar = ({showUpload, showHideUpload, showGet, showHideGet}: IProp
                 <Button variant="link" className={`nav-link ${!showUpload && !showGet ? 'active' : ''}`}>
                     Files
                 </Button>
-                <Button variant="link" className={`nav-link ${showUpload ? 'active' : ''}`} onClick={() => showHideUpload(true)}>
+                <Button variant="link" className={`nav-link ${showUpload ? 'active' : ''}`}
+                        onClick={() => showHideUpload(true)}>
                     Upload
                 </Button>
-                <Button variant="link" className={`nav-link ${showGet ? 'active' : ''}`} onClick={() => showHideGet(true)}>
+                <Button variant="link" className={`nav-link ${showGet ? 'active' : ''}`}
+                        onClick={() => showHideGet(true)}>
                     Get file
                 </Button>
             </Nav>
         </Navbar.Collapse>
-        <Navbar.Text>
-            <Row className="small text-white text-right"><strong>Balance:</strong> 10232.123124124542 FIL</Row>
-            <Row className="small text-white text-right"><strong>Main Address:</strong>
-                <span style={{textOverflow: "ellipsis"}}>t1hvuzpfdycc6z6mjgbiyaiojikd6wk2vwy7muuei</span></Row>
+        <Navbar.Text className={"nav-right"}>
+            <p><strong>Balance:</strong> 10232.123124124542 FIL</p>
+            <p><strong>Main Address:</strong>
+                <span style={{textOverflow: "ellipsis"}}>t1hvuzpfdycc6z6mjgbiyaiojikd6wk2vwy7muuei</span>
+            </p>
         </Navbar.Text>
-        <Image src={user_icon} roundedCircle width={45}/>
     </Navbar>
 </React.Fragment>
 

@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-import React, {Dispatch, SetStateAction} from "react";
-import {Container, Table} from "react-bootstrap";
+import React from "react";
+import {Container, Spinner, Table} from "react-bootstrap";
 import {DownloadButton, DownloadCloudButton, UploadCloudButton} from "../Components/Buttons";
-import {Spinner} from "../Components/Spinner";
-import {RetrieveFileModal} from "../Components/Modals/RetrieveFile";
+import {RetrieveFileModal, StoreFileModal} from "../Components/Modals";
 import {FileStatus, IFile} from "../_models/File";
 import {service} from "../_service/backend";
+import {Subscription} from "rxjs";
+import {FileStatusComponent} from "../Components/FileStatus";
 
 interface IProps {
-    files: IFile[];
-    setFiles: Dispatch<SetStateAction<IFile[]>>;
 }
 
 interface IModal {
@@ -35,18 +34,21 @@ interface IModal {
 
 interface IModals {
     retrieve: IModal;
-    upload: IModal;
-    // store: IModal;
+    store: IModal;
 }
 
 interface IState {
+    files: IFile[];
     modals: IModals;
 }
 
 export class FilesPage extends React.Component<IProps, IState> {
+    private subscriptions: Subscription[] = [];
+
     constructor(props: IProps) {
         super(props);
         this.state = {
+            files: [],
             modals: {
                 retrieve: {
                     file: null,
@@ -58,13 +60,13 @@ export class FilesPage extends React.Component<IProps, IState> {
                         this.setState({modals: modals})
                     }
                 },
-                upload: {
+                store: {
                     file: null,
                     show: false,
                     toggle: (file: IFile | null) => {
                         const modals = this.state.modals;
-                        modals.upload.show = file != null
-                        modals.upload.file = file
+                        modals.store.show = file != null
+                        modals.store.file = file
                         this.setState({modals: modals})
                     }
                 }
@@ -72,12 +74,21 @@ export class FilesPage extends React.Component<IProps, IState> {
         }
     }
 
+    componentWillUnmount() {
+        for (const subscription of this.subscriptions) {
+            subscription.unsubscribe()
+        }
+    }
+
     componentDidMount() {
-        service.reloadFiles(this.props.setFiles)
+        this.subscriptions.push(
+            service.files.subscribe(files => this.setState({files: files}))
+        )
+        service.reloadFiles()
     }
 
     render() {
-        return <Container fluid className="mt-4"><Table bordered hover>
+        return <Container fluid className="mt-4"><Table bordered hover responsive>
             <thead className="bg-dark text-light">
             <tr>
                 <th>CID</th>
@@ -91,9 +102,9 @@ export class FilesPage extends React.Component<IProps, IState> {
             </tr>
             </thead>
             <tbody>
-            {this.props.files.map((file, idx) => <tr key={idx}>
+            {this.state.files.map((file, idx) => <tr key={idx}>
                 <td>{file.cid}</td>
-                <td align="center">{file.status}</td>
+                <td align="center"><FileStatusComponent file={file}/></td>
                 <td align="center">{file.miners}</td>
                 <td align="center">{file.price}</td>
                 <td align="center">{file.duration}</td>
@@ -107,10 +118,10 @@ export class FilesPage extends React.Component<IProps, IState> {
                 toggle={this.state.modals.retrieve.toggle}
                 show={this.state.modals.retrieve.show}
                 file={this.state.modals.retrieve.file}/>
-            {/*<StoreFileModal*/}
-            {/*    toggle={this.state.modals.upload.toggle}*/}
-            {/*    show={this.state.modals.upload.show}*/}
-            {/*    file={this.state.modals.upload.file}/>*/}
+            <StoreFileModal
+                toggle={this.state.modals.store.toggle}
+                show={this.state.modals.store.show}
+                file={this.state.modals.store.file}/>
         </Container>;
     }
 }
@@ -123,15 +134,15 @@ interface IFileActionsProps {
 const FileActions = ({file, modals}: IFileActionsProps): JSX.Element => {
     switch (file.status) {
         case FileStatus.OnServer:
-            return <UploadCloudButton/>
-        case FileStatus.Downloading:
-            return <Spinner/>
+            return <UploadCloudButton onClick={() => modals.store.toggle(file)}/>
+        case FileStatus.Retrieving:
+            return <Spinner animation="border"/>
         case FileStatus.Sealed:
         case FileStatus.Staged:
             return <DownloadCloudButton onClick={() => modals.retrieve.toggle(file)}/>
         case FileStatus.Uploading:
-            return <Spinner/>
-        case FileStatus.Downloaded:
+            return <Spinner animation="border"/>
+        case FileStatus.Retrieved:
             return <DownloadButton/>
     }
 

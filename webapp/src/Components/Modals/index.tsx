@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import {Image} from "react-bootstrap";
-import spinner from "../_resources/icons/spinner-of-dots.svg";
-import React from "react";
-
-export const Spinner = () =>
-    <Image src={spinner} width={24}/>
+export * from './GetFile'
+export * from './RetrieveFileModal'
+export * from './StoreFileModal'
+export * from './UploadFile'

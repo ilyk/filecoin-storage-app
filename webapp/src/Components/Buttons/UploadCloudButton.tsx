@@ -16,9 +16,13 @@
 
 import {Button, Image} from "react-bootstrap";
 import upload_to_cloud from "../../_resources/icons/up-arrow-and-cloud.svg";
-import React from "react";
+import React, {MouseEventHandler} from "react";
 
-export const UploadCloudButton = () =>
-    <Button type="button" size="sm" variant="outline-secondary" title="Upload to Filecoin">
+interface IProps {
+    onClick: MouseEventHandler;
+}
+
+export const UploadCloudButton = ({onClick}: IProps) =>
+    <Button type="button" size="sm" variant="outline-secondary" title="Store to Filecoin" onClick={onClick}>
         <Image src={upload_to_cloud} width={24}/>
     </Button>

@@ -14,32 +14,15 @@
  * limitations under the License.
  */
 
-.modal-open .modal {
-    z-index: 999;
-}
-.modal-open .modal-backdrop {
-    z-index: 998;
+import {IFile} from "../_models/File";
+import React from "react";
+import {ProgressBar} from "react-bootstrap";
+
+interface IProps {
+    file: IFile
 }
 
-.navbar-dark .navbar-text.nav-right, footer .navbar-text {
-    color: white;
-    font-size: 0.8em;
-    text-align: right;
-}
-
-.navbar-dark .navbar-text.nav-right p {
-    text-align: right;
-    margin: 0;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-footer .navbar-text {
-    width: 100%;
-    text-align: center;
-}
-
-footer .navbar-text p {
-    margin: 0;
-}
+export const FileStatusComponent = ({file}: IProps) => <React.Fragment>
+    {file.status}
+    {file.status !== "Retrieving" && file.status !== "Uploading" || <ProgressBar now={file.progress}/>}
+</React.Fragment>

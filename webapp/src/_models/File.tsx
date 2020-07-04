@@ -18,14 +18,15 @@ import React from 'react';
 
 export enum FileStatus {
     OnServer = "OnServer",
-    Downloading = "Downloading",
+    Retrieving = "Retrieving",
     Sealed = "Sealed",
     Staged = "Staged",
     Uploading = "Uploading",
-    Downloaded = "Downloaded",
+    Retrieved = "Retrieved",
 }
 
 export interface IFile {
+    progress: number;
     cid: string
     status: FileStatus
     miners: number

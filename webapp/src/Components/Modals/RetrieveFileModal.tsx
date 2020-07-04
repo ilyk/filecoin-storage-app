@@ -19,6 +19,7 @@ import React, {useState} from "react";
 import {IFile} from "../../_models/File";
 import download_from_cloud from "../../_resources/icons/downloading-from-computing-cloud.svg";
 import {service} from "../../_service/backend";
+import {useToasts} from "react-toast-notifications";
 
 interface IProps {
     file: IFile | null;
@@ -26,27 +27,17 @@ interface IProps {
     show: boolean;
 }
 
-function start(file: IFile,addToast:Function) {
-    let err = service.startRetrieving(file.cid)
+const start = (cid: string, onOk: Function, onError: Function) => {
+    let err = service.startRetrieving(cid)
     if (err != null) {
-        addToast(err, {
-            appearance: 'error',
-            autoDismiss: true,
-        })
+        onError(err)
     } else {
-        addToast("Done!", {
-            appearance: 'info',
-            autoDismiss: true,
-        })
+        onOk()
     }
 }
 
-export const RetrieveFileModal = ({file, toggle, show}: IProps) => {
-    const [progress, setProgress] = useState(false)
-    //const { addToast } = useToasts()
-    const addToast = () => {}
-
-    return null == file ? <span/> : <Modal show={show} onHide={toggle}>
+export const RetrieveFileModal = ({file, toggle, show}: IProps) =>
+    null == file ? <span/> : <Modal show={show} onHide={toggle}>
         <Modal.Header closeButton>
             <Modal.Title>Retrieve File...</Modal.Title>
         </Modal.Header>
@@ -58,13 +49,35 @@ export const RetrieveFileModal = ({file, toggle, show}: IProps) => {
 
         <Modal.Footer>
             <Button variant="dark" onClick={() => toggle(null)}>Close</Button>
-            <Button variant="primary" onClick={() => {
-                setProgress(true);
-                start(file, addToast)
-            }} disabled={progress}>
-                <Image src={download_from_cloud} width={24}/>
-                Begin Retrieving
-            </Button>
+            <RetrieveFileButton cid={file.cid} toggle={toggle}/>
         </Modal.Footer>
     </Modal>
+
+interface IRetrieveFileButtonProps {
+    cid: string;
+    toggle: Function;
+}
+
+export const RetrieveFileButton = ({cid, toggle}: IRetrieveFileButtonProps) => {
+    const [progress, setProgress] = useState(false)
+    const {addToast} = useToasts()
+
+    const reset = () => {
+        setProgress(false)
+        toggle(null)
+    }
+    return <Button variant="primary" onClick={() => {
+        setProgress(true);
+        start(cid, () => {
+            addToast('Downloading...', {appearance: 'info'})
+            service.reloadFiles()
+            reset();
+        }, (err: Error) => {
+            addToast(err, {appearance: 'error'})
+            reset();
+        })
+    }} disabled={progress}>
+        <Image src={download_from_cloud} width={24}/>
+        Begin Retrieving
+    </Button>;
 }
